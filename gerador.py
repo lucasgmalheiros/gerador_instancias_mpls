@@ -1,4 +1,5 @@
 def unif(seed, low, high):
+    """Gerador que utiliza método da congruência linear"""
     m = 2147483647
     a = 16807
     b = 127773
@@ -12,7 +13,9 @@ def unif(seed, low, high):
     unif_ret = low + value_0_1 * (high - low)
     return unif_ret, seed
 
+
 def Gera_dados(nome, NN, MM, TT):
+    """Função principal de leitura dos parâmetros e contrução dos arquivos .dat"""
     # Read parameters from "gdado.dat"
     fname_ent = "../gdado.dat"
     try:
@@ -69,7 +72,7 @@ def Gera_dados(nome, NN, MM, TT):
         tokens = seed_lines[narq].split('=')
         seed = int(tokens[-1].strip())
 
-        fname_dat = "{}{}_{}_{}_{}.dat".format(nome, narq, NN, MM, TT)
+        fname_dat = f"{nome}{narq}_{NN}_{MM}_{TT}.dat"
 
         try:
             dat = open(fname_dat, "w")
@@ -122,46 +125,42 @@ def Gera_dados(nome, NN, MM, TT):
         else:
             maq = aux1 * 1.0
 
-        # Write to output file
-        print("{} {}".format(NN, TT), file=dat)
-        print("{}".format(MM), file=dat)
-        print("{:10.0f}".format(maq), file=dat)
+        # FORMATAÇÃO DO ARQUIVO DE OUTPUT
+        # Número de produtos | Número de períodos
+        print(f"{NN} {TT}", file=dat)
+        # Número de máquinas
+        print(f"{MM}", file=dat)
+        # Capacidade calculada acima
+        print(f"{maq:10.0f}", file=dat)
 
+        # Tempo de produção | Tempo setup | Custo de setup | Custo de produção
         for jj in range(MM):
             for ii in range(NN):
-                print("{:5.1f} {:5.1f} {:5.1f} {:5.1f}".format(
-                    bpdc[jj][ii], fpdc[jj][ii], spdc[jj][ii], cpdc[jj][ii]), file=dat)
+                print(f"{bpdc[jj][ii]:5.1f} {fpdc[jj][ii]:5.1f} {spdc[jj][ii]:5.1f} {cpdc[jj][ii]:5.1f}", file=dat)
 
+        # Linha com custos de armazenagem
         for ii in range(NN):
-            print("{:5.1f} ".format(hpdc[ii]), end='', file=dat)
+            print(f"{hpdc[ii]:5.1f} ", end='', file=dat)
         print("", file=dat)
-
-        if NN <= 15:
-            for tt in range(TT):
-                for ii in range(NN):
-                    print("{:5d} ".format(int(dpdc[tt][ii])), end='', file=dat)
-                print("", file=dat)
-        else:
-            for tt in range(TT):
-                for ii in range(15):
-                    print("{:5d} ".format(int(dpdc[tt][ii])), end='', file=dat)
-                print("", file=dat)
-            for tt in range(TT):
-                for ii in range(15, NN):
-                    print("{:5d} ".format(int(dpdc[tt][ii])), end='', file=dat)
-                print("", file=dat)
+        
+        # Demanda com 1 período por linha
+        for tt in range(TT):
+            for ii in range(NN):
+                print(f"{int(dpdc[tt][ii]):5d} ", end='', file=dat)
+            print("", file=dat)
 
         dat.close()
 
-    return 0
 
 def roda_problemas(tipo, inicio, fim, nome, tipocap, stcost, sttime):
+    """Define o número de produtos (NN), períodos (TT) e máquinas (MM) e chama a função Gera_dados"""
     vetorN = [0, 6, 12, 25, 50]
     for TT in range(6, 19, 6):
         for MM in range(2, 7, 2):
             for id in range(1, 5):
                 NN = vetorN[id]
-                erro = Gera_dados(nome, NN, MM, TT)
+                Gera_dados(nome, NN, MM, TT)
+
 
 def main():
     roda_problemas("CASBTB", 0, 9, "ABB0", 0.9, 1.0, 1.0)
@@ -172,6 +171,7 @@ def main():
     roda_problemas("CNSATB", 0, 9, "NAB0", 1.0, 10.0, 1.0)
     roda_problemas("CNSBTA", 0, 9, "NBA0", 1.0, 1.0, 1.5)
     roda_problemas("CNSATA", 0, 9, "NAA0", 1.0, 10.0, 1.5)
+
 
 if __name__ == "__main__":
     main()

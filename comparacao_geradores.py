@@ -54,7 +54,7 @@ def comparar_arquivos_pastas(pasta1, pasta2, output_csv):
 
 # Defina os caminhos das pastas e o arquivo de saída
 pasta_c = 'instancias_c'
-pasta_py = 'instancias_py'
+pasta_py = 'instancias_py_demand_adjust'
 output_csv = 'comparacao_arquivos.csv'
 
 # Chame a função para comparar os arquivos e salvar os resultados em CSV
