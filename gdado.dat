@@ -1,0 +1,22 @@
+custos
+
+mincustosetup = 5.0 
+maxcustosetup = 95.0 
+mincustoprod = 1.5
+maxcustoprod = 2.5
+mincustoestoq = 0.2
+maxcustoestoq = 0.4
+mindemanda =   0
+maxdemanda = 180
+
+
+tempos
+
+mintempoprod = 1.0 
+maxtempoprod = 5.0 
+mintemposetup = 10.0
+maxtemposetup = 50.0
+
+
+NP = 9
+
