@@ -1,5 +1,17 @@
 import os
 import csv
+import re
+
+def extract_numbers_from_file(filepath):
+    with open(filepath, 'r', encoding='utf-8') as f:
+        content = f.read()
+        # Remove any carriage returns for consistency
+        content = content.replace('\r\n', '\n').replace('\r', '\n')
+        # Use regex to find all numbers in the file
+        numbers = re.findall(r'[-+]?\d*\.\d+|\d+', content)
+        # Convert extracted strings to floats or ints
+        numbers = [float(num) if '.' in num else int(num) for num in numbers]
+    return numbers
 
 def comparar_arquivos_pastas(pasta1, pasta2, output_csv):
     arquivos_pasta1 = os.listdir(pasta1)
@@ -13,12 +25,24 @@ def comparar_arquivos_pastas(pasta1, pasta2, output_csv):
         caminho_arquivo1 = os.path.join(pasta1, arquivo)
         caminho_arquivo2 = os.path.join(pasta2, arquivo)
         
-        with open(caminho_arquivo1, 'r') as f1, open(caminho_arquivo2, 'r') as f2:
-            conteudo_arquivo1 = f1.read()
-            conteudo_arquivo2 = f2.read()
+        try:
+            numeros_arquivo1 = extract_numbers_from_file(caminho_arquivo1)
+            numeros_arquivo2 = extract_numbers_from_file(caminho_arquivo2)
             
-            iguais = conteudo_arquivo1 == conteudo_arquivo2
-            resultados.append([arquivo, iguais])
+            iguais = numeros_arquivo1 == numeros_arquivo2
+            if not iguais:
+                # Optionally, you can check if the difference is negligible
+                if len(numeros_arquivo1) == len(numeros_arquivo2):
+                    diffs = [abs(a - b) for a, b in zip(numeros_arquivo1, numeros_arquivo2)]
+                    max_diff = max(diffs)
+                    # Define a tolerance level, e.g., 1e-6
+                    tolerance = 1e-6
+                    iguais = max_diff < tolerance
+        except Exception as e:
+            print(f"Erro ao comparar {arquivo}: {e}")
+            iguais = False
+
+        resultados.append([arquivo, iguais])
 
     # Salva os resultados em um arquivo CSV
     with open(output_csv, mode='w', newline='') as file:

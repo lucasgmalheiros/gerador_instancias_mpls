@@ -35,8 +35,8 @@ def Gera_dados(nome, NN, MM, TT):
         params[key] = value
 
     # Assign parameters
-    L_min_s = params.get('mintemposetup', 0)
-    L_max_s = params.get('maxtemposetup', 0)
+    L_min_s = params.get('mincustosetup', 0)
+    L_max_s = params.get('maxcustosetup', 0)
     L_min_c = params.get('mincustoprod', 0)
     L_max_c = params.get('maxcustoprod', 0)
     L_min_h = params.get('mincustoestoq', 0)
@@ -45,8 +45,8 @@ def Gera_dados(nome, NN, MM, TT):
     L_max_d = params.get('maxdemanda', 0)
     L_min_b = params.get('mintempoprod', 0)
     L_max_b = params.get('maxtempoprod', 0)
-    L_min_f = params.get('mincustosetup', 0)
-    L_max_f = params.get('maxcustosetup', 0)
+    L_min_f = params.get('mintemposetup', 0)
+    L_max_f = params.get('maxtemposetup', 0)
     # If any parameter is missing, print an error
     required_params = ['mintemposetup', 'maxtemposetup', 'mincustoprod', 'maxcustoprod',
                        'mincustoestoq', 'maxcustoestoq', 'mindemanda', 'maxdemanda',
