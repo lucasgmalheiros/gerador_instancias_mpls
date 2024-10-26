@@ -82,7 +82,7 @@ def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, typ
 
         # Generate data
         # Initialize arrays with numpy
-        inventory_costs = np.zeros(n_products)  # Inventory costs for each product
+        inventory_costs = np.zeros(n_products * n_plants)  # Inventory costs for each product
         production_costs = np.zeros((n_plants, n_products))  # Production costs by plant and product
         setup_costs = np.zeros((n_plants, n_products))  # Setup costs by plant and product
         production_times = np.zeros((n_plants, n_products))  # Production time by plant and product
@@ -90,26 +90,32 @@ def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, typ
         demands = np.zeros((n_periods, n_products * n_plants))  # Demand by period and product
         transport_costs = np.zeros((n_plants, n_plants))  # Transport costs from plant to plant
         capacities = np.zeros(n_plants)  # Capacity per plant
+        
+        # Inventory costs data
+        for z in range(n_products * n_plants):
+            inventory_costs[z], seed = uniform(seed, MIN_INVENTORY_COST, MAX_INVENTORY_COST)
 
-        # Costs data
+        # Production and setup costs data
         for i in range(n_products):
-            inventory_costs[i], seed = uniform(seed, MIN_INVENTORY_COST, MAX_INVENTORY_COST)
             for j in range(n_plants):
                 production_costs[j, i], seed = uniform(seed, MIN_PRODUCTION_COST, MAX_PRODUCTION_COST)
                 setup_costs[j, i], seed = uniform(seed, MIN_SETUP_COST, MAX_SETUP_COST)
+                # Apply type 2 for setup costs
+                setup_costs[j, i] *= type2
 
         # Times data
         for i in range(n_products):
             for j in range(n_plants):
                 production_times[j, i], seed = uniform(seed, MIN_PRODUCTION_TIME, MAX_PRODUCTION_TIME)
                 setup_times[j, i], seed = uniform(seed, MIN_SETUP_TIME, MAX_SETUP_TIME)
+                # Apply type 1 for setup times
+                setup_times[j, i] *= type1
 
         # Demand matrix
         for t in range(n_periods):
             for z in range(n_products * n_plants):
                 value, seed = uniform(seed, MIN_DEMAND, MAX_DEMAND)
                 demands[t, z] = np.ceil(value)
-        print(demands)
 
         # Symmetric transport costs matrix
         for j in range(n_plants):
@@ -128,7 +134,9 @@ def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, typ
             for i in range(n_products):
                 for t in range(n_periods):
                     sum_necessities += setup_times[j, i] + production_times[j, i] * demands[t, i]
-            capacities[j] = np.ceil((sum_necessities / n_periods) * type3)  # Capacidade ajustada pelo tipo3
+            capacities[j] = np.ceil(sum_necessities / n_periods)
+            # Apply type 3 for capacities values
+            capacities[j] *= type3
 
 
         # OUTPUT FILE FORMATTING
@@ -154,10 +162,10 @@ def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, typ
                 print(f'{production_times[j, i]:5.1f} {setup_times[j, i]:5.1f} {setup_costs[j, i]:5.1f} {production_costs[j, i]:5.1f}', file=dat)
 
         # Inventory costs line
-        for i in range(n_products):
-            print(f'{inventory_costs[i]:5.1f} ', end='', file=dat)
+        for z in range(n_products * n_plants):
+            print(f'{inventory_costs[z]:5.1f} ', end='', file=dat)
         print('', file=dat)
-        
+
         # Demand matrix (one period per line)
         for t in range(n_periods):
             for z in range(n_products * n_plants):
@@ -173,7 +181,7 @@ def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, typ
         dat.close()
 
 
-def run_problems(type_: str, start: int, end: int, name: str, setup_cost: float, setup_time: float, cap_type:float) -> None:
+def run_problems(type_: str, start: int, end: int, name: str, setup_time: float, setup_cost: float, cap_type:float) -> None:
     """Defines the number of products, periods and machines, and calls the generate_data function"""
     # vectorN = [12]
     # for t in range(6, 7):
@@ -181,7 +189,7 @@ def run_problems(type_: str, start: int, end: int, name: str, setup_cost: float,
     #         for id in range(0, 1):
     #             NN = vectorN[id]
     #             generate_data(name, NN, MM, t)
-    generate_data(name, n_periods=12, n_plants=2, n_products=6, type1=setup_cost, type2=setup_time, type3=cap_type, n_instances=1,)
+    generate_data(name, n_periods=12, n_plants=2, n_products=6, type1=setup_time, type2=setup_cost, type3=cap_type, n_instances=1)
 
 
 def main() -> None:
