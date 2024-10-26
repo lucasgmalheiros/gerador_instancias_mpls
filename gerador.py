@@ -1,6 +1,6 @@
 import numpy as np
 
-def uniform(seed, low, high):
+def uniform(seed: int, low: float, high: float) -> tuple:
     """Generator that uses the linear congruential method"""
     m = 2147483647
     a = 16807
@@ -16,7 +16,7 @@ def uniform(seed, low, high):
     return uniform_ret, seed
 
 
-def generate_data(name, n_products, n_plants, n_periods, type1, type2, type3, n_instances=10):
+def generate_data(name: str, n_products: int, n_plants: int, n_periods: int, type1: float, type2: float, type3: float, n_instances: int=10) -> None:
     """Main function for reading parameters and constructing .dat files"""
     # Read parameters from 'gdata.dat'
     input_filename = 'gdata.dat'
@@ -80,13 +80,6 @@ def generate_data(name, n_products, n_plants, n_periods, type1, type2, type3, n_
         tokens = seed_lines[instance_num].split('=')
         seed = int(tokens[-1].strip())
 
-        output_filename = f'{name}{instance_num}_{n_periods}_{n_plants}_{n_products}.dat'
-
-        try:
-            dat = open(output_filename, 'w')
-        except IOError:
-            print('Error opening the output file!!!')
-
         # Generate data
         # Initialize arrays with numpy
         inventory_costs = np.zeros(n_products)  # Inventory costs for each product
@@ -138,10 +131,18 @@ def generate_data(name, n_products, n_plants, n_periods, type1, type2, type3, n_
 
 
         # OUTPUT FILE FORMATTING
+        output_filename = f'{name}{instance_num}_{n_periods}_{n_plants}_{n_products}.dat'
+        try:
+            dat = open(output_filename, 'w')
+        except IOError:
+            print('Error opening the output file!!!')
+
         # Number of products | Number of periods
         print(f'{n_products} {n_periods}', file=dat)
+
         # Number of machines
         print(f'{n_plants}', file=dat)
+
         # Capacities calculated above
         for j in range(n_plants):
             print(f'{capacities[j]:10.0f}', file=dat)
@@ -171,8 +172,8 @@ def generate_data(name, n_products, n_plants, n_periods, type1, type2, type3, n_
         dat.close()
 
 
-def run_problems(type_, start, end, name, setup_cost, setup_time, cap_type):
-    """Defines the number of products (NN), periods (t) and machines (MM) and calls the generate_data function"""
+def run_problems(type_: str, start: int, end: int, name: str, setup_cost: float, setup_time: float, cap_type:float) -> None:
+    """Defines the number of products, periods and machines, and calls the generate_data function"""
     # vectorN = [12]
     # for t in range(6, 7):
     #     for MM in range(2, 3):
@@ -182,7 +183,7 @@ def run_problems(type_, start, end, name, setup_cost, setup_time, cap_type):
     generate_data(name, 6, 6, 12, type1=setup_cost, type2=setup_time, type3=cap_type, n_instances=1,)
 
 
-def main():
+def main() -> None:
     run_problems('CASATA', 0, 9, 'AAA0', 1.5, 10.0, 0.9)
     # run_problems('CASATB', 0, 9, 'AAB0', 1.0, 10.0, 0.9)
     # run_problems('CASBTA', 0, 9, 'ABA0', 1.5, 1.0, 0.9)
