@@ -16,7 +16,7 @@ def uniform(seed: int, low: float, high: float) -> tuple:
     return uniform_ret, seed
 
 
-def generate_data(name: str, n_products: int, n_plants: int, n_periods: int, type1: float, type2: float, type3: float, n_instances: int=10) -> None:
+def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, type1: float, type2: float, type3: float, n_instances: int=10) -> None:
     """Main function for reading parameters and constructing .dat files"""
     # Read parameters from 'gdata.dat'
     input_filename = 'gdata.dat'
@@ -87,7 +87,7 @@ def generate_data(name: str, n_products: int, n_plants: int, n_periods: int, typ
         setup_costs = np.zeros((n_plants, n_products))  # Setup costs by plant and product
         production_times = np.zeros((n_plants, n_products))  # Production time by plant and product
         setup_times = np.zeros((n_plants, n_products))  # Setup time by plant and product
-        demands = np.zeros((n_periods, n_products))  # Demand by period and product
+        demands = np.zeros((n_periods, n_products * n_plants))  # Demand by period and product
         transport_costs = np.zeros((n_plants, n_plants))  # Transport costs from plant to plant
         capacities = np.zeros(n_plants)  # Capacity per plant
 
@@ -105,10 +105,11 @@ def generate_data(name: str, n_products: int, n_plants: int, n_periods: int, typ
                 setup_times[j, i], seed = uniform(seed, MIN_SETUP_TIME, MAX_SETUP_TIME)
 
         # Demand matrix
-        for i in range(n_products):
-            for t in range(n_periods):
+        for t in range(n_periods):
+            for z in range(n_products * n_plants):
                 value, seed = uniform(seed, MIN_DEMAND, MAX_DEMAND)
-                demands[t, i] = 1.0 * int(value)
+                demands[t, z] = np.ceil(value)
+        print(demands)
 
         # Symmetric transport costs matrix
         for j in range(n_plants):
@@ -159,8 +160,8 @@ def generate_data(name: str, n_products: int, n_plants: int, n_periods: int, typ
         
         # Demand matrix (one period per line)
         for t in range(n_periods):
-            for i in range(n_products):
-                print(f'{int(demands[t, i]):5d} ', end='', file=dat)
+            for z in range(n_products * n_plants):
+                print(f'{int(demands[t, z]):5d} ', end='', file=dat)
             print('', file=dat)
 
         # Transport costs matrix
@@ -180,7 +181,7 @@ def run_problems(type_: str, start: int, end: int, name: str, setup_cost: float,
     #         for id in range(0, 1):
     #             NN = vectorN[id]
     #             generate_data(name, NN, MM, t)
-    generate_data(name, 6, 6, 12, type1=setup_cost, type2=setup_time, type3=cap_type, n_instances=1,)
+    generate_data(name, n_periods=12, n_plants=2, n_products=6, type1=setup_cost, type2=setup_time, type3=cap_type, n_instances=1,)
 
 
 def main() -> None:
