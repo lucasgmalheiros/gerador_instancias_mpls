@@ -185,8 +185,8 @@ def run_problems(type_: str, start: int, end: int, name: str, setup_time: float,
     """Defines the number of products, periods and machines, and calls the generate_data function"""
     for t in [12]:  # Periods
         for j in [2, 4, 6, 15, 20]:  # Plants
-            for i in [10, 30, 60, 90, 120]:  # Products
-                generate_data(name, n_periods=t, n_plants=j, n_products=i, type1=setup_time, type2=setup_cost, type3=cap_type)
+            for i in [10, 60, 120]:  # Products
+                generate_data(name, n_periods=t, n_plants=j, n_products=i, type1=setup_time, type2=setup_cost, type3=cap_type, n_instances=5)
 
 
 def main() -> None:
