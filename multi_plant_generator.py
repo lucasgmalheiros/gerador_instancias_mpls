@@ -133,7 +133,7 @@ def generate_data(name: str, n_periods: int, n_plants: int, n_products: int, typ
             sum_necessities = 0
             for i in range(n_products):
                 for t in range(n_periods):
-                    sum_necessities += setup_times[j, i] + production_times[j, i] * demands[t, i]
+                    sum_necessities += setup_times[j, i] + production_times[j, i] * demands[t, (j * n_products) + i]
             capacities[j] = np.ceil(sum_necessities / n_periods)
             # Apply type 3 for capacities values
             capacities[j] *= type3
